@@ -1,13 +1,43 @@
+#version 1.0
+#MAE
+
+import PySimpleGUI as sg
+
 def calculator(expression):
     try:
         result = eval(expression)
         return result
-    except Exception as error:
-        return error
+    except Exception as e:
+        return f"Error: {str(e)}"
+
+layout = [
+    [sg.Text("Введите математическое выражение:")],
+    [sg.Input(key="-EXPRESSION-")],
+    [sg.Button("Расчет"), sg.Button("Выход")],
+    [sg.Text(size=(40, 1), key="-OUTPUT-")],
+    [sg.Text("История расчетов:")],
+    [sg.Listbox(values=[], size=(45, 6), key="-HISTORY-", select_mode=sg.LISTBOX_SELECT_MODE_SINGLE)]
+]
+
+window = sg.Window("Калькулятор", layout)
+history = []
+
 while True:
-    expression = input("Введите выражение: ")
-    if expression.strip() == '':
+    event, values = window.read()
+
+    if event == sg.WIN_CLOSED or event == "Выход":
         break
-    result = calculator(expression)
-    print("Результат: ", result)
-    print("Для выхода нажать Enter")
+
+    if event == "Расчет":
+        expression = values["-EXPRESSION-"]
+        result = calculator(expression)
+        window["-OUTPUT-"].update(f"Результат: {result}")
+
+        # Добавляем выражение и результат в историю
+        history.append(f"{expression} = {result}")
+        # Обновляем список истории на экране
+        window["-HISTORY-"].update(values=history)
+
+window.close()
+
+# pyinstaller -w --onefile calcg.py
