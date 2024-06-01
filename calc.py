@@ -1,6 +1,3 @@
-#version 1.0
-#MAE
-
 import PySimpleGUI as sg
 
 def calculator(expression):
@@ -19,7 +16,11 @@ layout = [
     [sg.Listbox(values=[], size=(45, 6), key="-HISTORY-", select_mode=sg.LISTBOX_SELECT_MODE_SINGLE)]
 ]
 
-window = sg.Window("Калькулятор", layout)
+window = sg.Window("Калькулятор", layout, finalize=True)
+
+# Привязываем событие Enter к полю ввода
+window["-EXPRESSION-"].bind("<Return>", "_Enter")
+
 history = []
 
 while True:
@@ -28,7 +29,7 @@ while True:
     if event == sg.WIN_CLOSED or event == "Выход":
         break
 
-    if event == "Расчет":
+    if event == "Расчет" or event == "-EXPRESSION-_Enter":
         expression = values["-EXPRESSION-"]
         result = calculator(expression)
         window["-OUTPUT-"].update(f"Результат: {result}")
@@ -39,5 +40,3 @@ while True:
         window["-HISTORY-"].update(values=history)
 
 window.close()
-
-# pyinstaller -w --onefile calcg.py
